@@ -1,0 +1,162 @@
+openapi: 3.1.0
+info:
+  title: Lex Search API
+  version: 0.7.0
+  description: |
+    Pesquisa assistida em fontes públicas verificáveis. Cada resultado inclui origem,
+    URL oficial e instante de recuperação. Revisão humana é obrigatória.
+    A ausência de resultados não constitui conclusão jurídica.
+  contact:
+    name: HomoSapiens.id
+servers:
+  - url: https://lex.homosapiens.id
+paths:
+  /health:
+    get:
+      summary: Saúde do Search Core
+      operationId: getHealth
+      responses:
+        "200":
+          description: Serviço online
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+  /v1/readiness:
+    get:
+      summary: Prontidão e fontes online
+      operationId: getReadiness
+      responses:
+        "200":
+          description: Serviço pronto
+  /v1/sources:
+    get:
+      summary: Registro de fontes e estado dos conectores
+      operationId: listSources
+      responses:
+        "200":
+          description: Registro de fontes
+  /v1/search:
+    post:
+      summary: Pesquisa global em fontes públicas
+      description: |
+        Retorna apenas registros recuperados de fontes consultadas. Resultados sintéticos
+        são proibidos. Fontes indisponíveis aparecem em evidence/warnings.
+      operationId: search
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+            examples:
+              lgpd:
+                value:
+                  query: proteção de dados pessoais
+                  limit: 5
+      responses:
+        "200":
+          description: Pesquisa concluída, inclusive quando result_count for zero
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResponse"
+        "422":
+          description: Consulta ausente ou limite inválido
+components:
+  schemas:
+    Health:
+      type: object
+      required: [status, service, version, human_review_required, no_invention_policy]
+      properties:
+        status: {type: string, const: ok}
+        service: {type: string}
+        version: {type: string}
+        generated_at: {type: string, format: date-time}
+        real_sources_online:
+          type: array
+          items: {type: string}
+        human_review_required: {type: boolean, const: true}
+        no_invention_policy: {type: boolean, const: true}
+    SearchRequest:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+          minLength: 1
+          maxLength: 500
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 20
+          default: 10
+    SearchResult:
+      type: object
+      required: [id, title, source, source_url, is_official, is_synthetic]
+      properties:
+        id: {type: string}
+        title: {type: string}
+        summary: {type: string}
+        type: {type: string}
+        date: {type: string}
+        organization: {type: string}
+        source: {type: string}
+        source_label: {type: string}
+        source_url: {type: string, format: uri}
+        official_url: {type: string, format: uri}
+        is_official: {type: boolean}
+        is_synthetic: {type: boolean, const: false}
+        retrieved_at: {type: string, format: date-time}
+    Evidence:
+      type: object
+      properties:
+        source: {type: string}
+        status: {type: string}
+        count: {type: integer}
+        request_url: {type: string, format: uri}
+        error_type: {type: string}
+        message: {type: string}
+    SearchResponse:
+      type: object
+      required:
+        - status
+        - trace_id
+        - query
+        - result_count
+        - results
+        - evidence
+        - human_review_required
+        - no_invention_policy
+      properties:
+        status: {type: string, const: ok}
+        service: {type: string}
+        version: {type: string}
+        generated_at: {type: string, format: date-time}
+        trace_id: {type: string, format: uuid}
+        query: {type: string}
+        scope: {type: string}
+        result_count: {type: integer}
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchResult"
+        evidence:
+          type: array
+          items:
+            $ref: "#/components/schemas/Evidence"
+        sources_used:
+          type: array
+          items: {type: string}
+        integrity:
+          type: object
+          properties:
+            official: {type: integer}
+            synthetic: {type: integer}
+            source_urls_present: {type: integer}
+        warnings:
+          type: array
+          items: {type: string}
+        human_review_required: {type: boolean, const: true}
+        no_invention_policy: {type: boolean, const: true}
+        duration_ms: {type: integer}
