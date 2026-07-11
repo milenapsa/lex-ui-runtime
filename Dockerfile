@@ -2,10 +2,12 @@ FROM nginx:1.27-alpine
 
 WORKDIR /usr/share/nginx/html
 
-COPY index.html.gz.b64 /tmp/index.html.gz.b64
+COPY index.part1 /tmp/index.part1
+COPY index.part2 /tmp/index.part2
+COPY index.part3 /tmp/index.part3
 
-RUN base64 -d /tmp/index.html.gz.b64 | gzip -d > /usr/share/nginx/html/index.html \
- && rm /tmp/index.html.gz.b64 \
+RUN cat /tmp/index.part1 /tmp/index.part2 /tmp/index.part3 > /usr/share/nginx/html/index.html \
+ && rm /tmp/index.part1 /tmp/index.part2 /tmp/index.part3 \
  && echo "80dba7f5c515c6b00729b536207c9398dd86862001f3c3d77c5288f67de636d8  /usr/share/nginx/html/index.html" | sha256sum -c
 
 EXPOSE 80
