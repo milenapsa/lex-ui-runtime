@@ -1,0 +1,71 @@
+.textContent.trim();query.focus()});
+
+function statusClass(s=''){return /ok|online|ready|configured/i.test(s)?'ok':'warn'}
+function sourceRows(sources=[]){
+  if(!sources.length)return '<p>Nenhuma fonte registrada.</p>';
+  return sources.map(s=>`<div class="source-row"><div><strong>${esc(s.name||s.id||'Fonte')}</strong><small>${esc((s.coverage||[]).join(' · ')||'cobertura não informada')}</small></div><span class="status ${statusClass(s.status)}">${esc(s.status||'desconhecido')}</span></div>`).join('');
+}
+function evidenceRows(items=[]){
+  if(!items.length)return '<p>Nenhuma chamada de fonte foi registrada.</p>';
+  return items.map(e=>`<div class="source-row"><div><strong>${esc(e.source||'Fonte')}</strong><small>${esc(e.request_url||e.message||'')}</small></div><span class="status ${statusClass(e.status)}">${esc(e.status||'desconhecido')}${Number.isFinite(e.count)?` · ${e.count}`:''}</span></div>`).join('');
+}
+function resultCard(r){
+ const official=r.official_url||r.source_url||'#', source=r.source_url||r.official_url||'#';
+ return `<article class="result-card">
+   <div><span class="type">${esc(r.type||'resultado oficial')}</span><div class="date">${esc(r.date||'data não informada')}</div></div>
+   <div><h3>${esc(r.title||'Resultado sem título')}</h3><p>${esc(r.summary||'A fonte não forneceu resumo.')}</p></div>
+   <div><div class="org">${esc(r.organization||r.source_label||'Fonte pública')}</div><div class="actions">
+     ${official!=='#'?`<a class="primary" href="${esc(official)}" target="_blank" rel="noopener">Abrir página oficial ↗</a>`:''}
+     ${source!=='#'&&source!==official?`<a href="${esc(source)}" target="_blank" rel="noopener">Abrir registro da API ↗</a>`:''}
+   </div></div>
+ </article>`;
+}
+function render(data){
+ const results=data.results||[], evidence=data.evidence||[], sources=data.sources||[];
+ const integrity=data.integrity||{}, trace=data.trace_id||'não informado';
+ const zero=!results.length;
+ output.innerHTML=`
+   <div class="result-head"><div><span class="eyebrow">Resultado da consulta</span><h2>${esc(data.query||'Consulta')}</h2></div><div class="trace">trace_id<br>${esc(trace)}<br>${esc(data.generated_at||'')}</div></div>
+   <section class="summary">
+     <h3>Leitura operacional</h3>
+     <p>${zero?'Nenhum resultado oficial aderente foi localizado nas fontes consultadas. Isso não demonstra inexistência de direito, tese ou precedente; demonstra apenas insuficiência da cobertura atual para esta consulta.':`${results.length} resultado(s) oficial(is) foram recuperados. Confira o conteúdo integral na origem antes de qualquer uso profissional.`}</p>
+     <div class="summary-grid">
+       <div class="metric"><strong>${results.length}</strong><span>resultados</span></div>
+       <div class="metric"><strong>${integrity.official??results.filter(r=>r.is_official).length}</strong><span>oficiais</span></div>
+       <div class="metric"><strong>${integrity.synthetic??results.filter(r=>r.is_synthetic).length}</strong><span>sintéticos</span></div>
+       <div class="metric"><strong>${esc(data.duration_ms??'—')}</strong><span>milissegundos</span></div>
+     </div>
+   </section>
+   ${zero?`<section class="zero"><h3>Base insuficiente para conclusão jurídica</h3><p>A Lex não atribuiu percentual, probabilidade ou jurisprudência à consulta. Amplie os termos, escolha outro recorte ou aguarde a ativação de novas fontes.</p></section>`:''}
+   ${results.length?`<section class="results">${results.map(resultCard).join('')}</section>`:''}
+   <section class="coverage" id="cobertura">
+     <div class="panel"><h3>Fontes registradas</h3><div id="registrySlot">${sourceRows(sources)}</div></div>
+     <div class="panel"><h3>Evidência da execução</h3>${evidenceRows(evidence)}</div>
+   </section>
+   <details id="tecnico"><summary>Detalhes técnicos da requisição</summary><pre>${esc(JSON.stringify(data,null,2))}</pre></details>`;
+ loadRegistry();
+}
+async function loadRegistry(){
+ try{
+  const r=await fetch('/v1/sources',{cache:'no-store'}); if(!r.ok)return;
+  const d=await r.json(), slot=$('#registrySlot'); if(slot)slot.innerHTML=sourceRows(d.sources||[]);
+ }catch{}
+}
+form.onsubmit=async e=>{
+ e.preventDefault(); const q=query.value.trim(); if(!q)return;
+ submit.disabled=true; submit.textContent='Consultando'; notice.className='notice'; notice.textContent='Consulta enviada às fontes disponíveis.';
+ try{
+  const r=await fetch('/v1/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,limit:10})});
+  const d=await r.json(); if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
+  render(d); notice.textContent='Consulta concluída. Confirme os documentos nas páginas oficiais antes do uso profissional.';
+ }catch(err){notice.className='notice error';notice.textContent='Não foi possível concluir a consulta: '+err.message}
+ finally{submit.disabled=false;submit.textContent='Pesquisar'}
+};
+fetch('/health',{cache:'no-store'}).then(async r=>{
+ const d=await r.json().catch(()=>({})); const ok=r.ok;
+ $('#healthDot').className='dot '+(ok?'ok':''); $('#healthLabel').textContent=ok?`serviço online · ${d.version||'versão ativa'}`:'serviço em atenção';
+ $('#apiTag').textContent=ok?'API: online':'API: atenção';
+}).catch(()=>{$('#healthLabel').textContent='serviço indisponível';$('#apiTag').textContent='API: indisponível'});
+</script>
+</body>
+</html>
