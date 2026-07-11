@@ -1,0 +1,53 @@
+{
+  "artifact": "lex-pilot-public-proof",
+  "generated_at": "2026-07-11T23:05:51Z",
+  "status": "operational_pilot",
+  "domain": "lex.homosapiens.id",
+  "ui": {
+    "status": "http_200",
+    "container": "homosapiens-lex-ui-v51"
+  },
+  "search_core": {
+    "container": "homosapiens-lex-search-core-v51",
+    "version": "0.7.0-real-sources-canary",
+    "health": "ok",
+    "readiness": "ready"
+  },
+  "gateway": {
+    "container": "homosapiens-lex-api-gateway-v08",
+    "version": "0.8.0-pilot",
+    "demo_limit_per_hour": 20,
+    "commercial_limit_per_minute": 120,
+    "commercial_auth": "pending_external_secret"
+  },
+  "validation": {
+    "query": "proteção de dados pessoais",
+    "trace_id": "e1a8b5fd-9486-477c-a5ae-aa48deea0c66",
+    "result_count": 1,
+    "official": 1,
+    "synthetic": 0,
+    "access_tier": "public_demo",
+    "marker": "LEX_API_GATEWAY_V08_PUBLIC_SMOKE_V2_OK"
+  },
+  "sources": {
+    "online": [
+      "camara_proposicoes",
+      "tse_ckan"
+    ],
+    "needs_secret": [
+      "cnj_datajud"
+    ],
+    "in_development": [
+      "lexml_sru",
+      "stj_ckan",
+      "stf_corte_aberta"
+    ]
+  },
+  "rollback": {
+    "snapshot_id": 297218,
+    "legacy_backend_preserved": true,
+    "caddy_backup": "Caddyfile.lex-gateway-v08-.bak"
+  },
+  "human_review_required": true,
+  "no_invention_policy": true
+}
