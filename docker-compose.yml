@@ -1,0 +1,13 @@
+services:
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: homosapiens-lex-ui-v51
+    restart: unless-stopped
+    networks:
+      - lex-ui-v51
+
+networks:
+  lex-ui-v51:
+    name: lex-ui-v51
