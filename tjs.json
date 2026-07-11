@@ -1,7 +1,7 @@
 {
   "artifact": "lex-tj-registry-v1",
   "source": "CNJ DataJud API Pública",
-  "documentation": "https://datajud-wiki.cnjnjus.br/api-publica/",
+  "documentation": "https://datajud-wiki.cnj.jus.br/api-publica/",
   "status": "prepared_awaiting_external_secret",
   "court_count": 27,
   "human_review_required": true,
