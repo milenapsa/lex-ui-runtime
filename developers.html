@@ -1,0 +1,16 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lex API — Desenvolvedores</title><style>body{margin:0;background:#f2f0ea;color:#11120f;font:16px/1.55 system-ui,sans-serif}.wrap{max-width:980px;margin:auto;padding:48px 24px}a{color:#2357ff}h1{font-size:52px;line-height:1;margin:16px 0 24px}h2{margin-top:42px;border-top:1px solid #ccc;padding-top:24px}code,pre{font-family:ui-monospace,monospace}pre{background:#11120f;color:#f2f0ea;padding:20px;overflow:auto}.tag{font:11px ui-monospace,monospace;text-transform:uppercase;border:1px solid #bbb;padding:6px 8px}.note{background:#fff7de;padding:18px;border-left:4px solid #8a5a00}</style></head><body><main class="wrap"><span class="tag">Lex / API pública v0.7</span><h1>Integre pesquisa com fonte verificável.</h1><p>A API Lex consulta fontes públicas, preserva a proveniência e nunca fabrica jurisprudência ou resultado ausente.</p><p><a href="/">Abrir produto</a> · <a href="/openapi.yaml">Baixar OpenAPI</a> · <a href="/health">Health</a> · <a href="/v1/sources">Fontes</a></p><h2>Primeira chamada</h2><pre><code>curl -X POST https://lex.homosapiens.id/v1/search \
+  -H 'Content-Type: application/json' \
+  --data '{"query":"proteção de dados pessoais","limit":5}'</code></pre><h2>Contrato de integridade</h2><p>Cada resultado informa fonte, URL oficial, órgão e horário de recuperação. O campo <code>is_synthetic</code> deve permanecer falso. O <code>trace_id</code> permite rastrear a requisição.</p><div class="note"><strong>Limite jurídico:</strong> a resposta não substitui revisão profissional. Resultado zero significa cobertura insuficiente para a consulta, e não inexistência de direito, norma ou precedente.</div><h2>Cobertura atual</h2><p>Câmara dos Deputados e TSE Dados Abertos estão conectados. DataJud depende de configuração externa segura. LexML, STJ e STF ainda não possuem cobertura substancial validada neste runtime.</p><h2>Resposta mínima</h2><pre><code>{
+  "trace_id": "uuid",
+  "result_count": 3,
+  "results": [{
+    "title": "PL 3278/2026",
+    "source": "camara_proposicoes",
+    "source_url": "https://...",
+    "official_url": "https://...",
+    "is_official": true,
+    "is_synthetic": false
+  }],
+  "human_review_required": true,
+  "no_invention_policy": true
+}</code></pre></main></body></html>
