@@ -1,0 +1,69 @@
+ a.primary{background:var(--ink);color:#fff}
+.coverage{display:grid;grid-template-columns:1fr 1fr}
+.panel{padding:24px 26px;border-bottom:1px solid var(--line)}.panel:nth-child(odd){border-right:1px solid var(--line)}
+.panel h3{margin:0 0 14px;font-size:15px}.source-row{display:grid;grid-template-columns:1fr auto;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.source-row:first-of-type{border-top:0}.source-row strong,.source-row small{display:block}.source-row small{color:#666}
+.status{font:10px var(--mono);padding:5px 7px;border:1px solid var(--line);text-transform:uppercase;height:max-content}
+.status.ok{background:#dcf5e8;color:var(--green)}.status.warn{background:#fff2cf;color:var(--amber)}
+details{border-bottom:1px solid var(--line);background:#13140f;color:#f1f0e9}
+summary{cursor:pointer;padding:16px 26px;font:11px var(--mono);text-transform:uppercase}
+pre{margin:0;padding:20px 26px;white-space:pre-wrap;word-break:break-word;font:12px/1.55 var(--mono);max-height:440px;overflow:auto;border-top:1px solid #333}
+.footer{display:grid;grid-template-columns:repeat(3,1fr);padding:24px 22px;font-size:12px}.footer>*+*{border-left:1px solid var(--line);padding-left:22px}
+@media(max-width:900px){
+ .nav{grid-template-columns:1fr auto}.links{display:none}.hero,.workspace,.coverage,.footer{grid-template-columns:1fr}.hero>*+*,.footer>*+*{border-left:0;border-top:1px solid var(--line)}.sidebar{border-right:0;border-bottom:1px solid var(--line);min-height:auto}.search-row,.result-card,.summary-grid{grid-template-columns:1fr}.result-card>*+*,.metric+.metric{border-left:0;border-top:1px solid var(--line)}.panel:nth-child(odd){border-right:0}.result-head{grid-template-columns:1fr}.result-head .trace{text-align:left}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="top"><span class="live"><i class="dot" id="healthDot"></i><span id="healthLabel">verificando serviço</span></span><span>revisão humana obrigatória · nenhuma resposta inventada</span></div>
+  <header class="nav">
+    <a class="brand" href="/">Lex<small>HomoSapiens legal intelligence</small></a>
+    <nav class="links"><a href="#pesquisa">Pesquisa</a><a href="#cobertura">Cobertura</a><a href="#tecnico">Retorno técnico</a></nav>
+    <a class="back" href="https://homosapiens.id">HomoSapiens.id ↗</a>
+  </header>
+
+  <section class="hero">
+    <aside><span class="eyebrow">Produto / 01</span><div class="meta"><span class="tag">Brasil</span><span class="tag">R4 jurídico</span></div></aside>
+    <div><span class="eyebrow">Pesquisa jurídica com proveniência</span><h1>Encontre a fonte. <em>Preserve o contexto.</em></h1><p>Lex consulta bases públicas, normaliza os resultados e mostra a origem antes de qualquer interpretação. Ausência de resultado é apresentada como ausência de base, não como certeza jurídica.</p></div>
+    <aside class="quote"><blockquote>Uma resposta útil começa pela possibilidade de conferir de onde ela veio.</blockquote><div><div class="signal"></div><p class="eyebrow">source / evidence / human review</p></div></aside>
+  </section>
+
+  <section class="workspace" id="pesquisa">
+    <aside class="sidebar">
+      <h2>Consultas de demonstração</h2>
+      <div class="examples">
+        <button class="example">proteção de dados pessoais</button>
+        <button class="example">responsabilidade civil por falha na prestação de serviço</button>
+        <button class="example">requisitos da tutela de urgência no CPC</button>
+        <button class="example">qualidade de segurado e benefício por incapacidade</button>
+        <button class="example">percentual de alimentos para filho adolescente</button>
+      </div>
+      <p class="side-note">A cobertura atual é parcial. Resultados oficiais não equivalem a parecer, tese final ou previsão de êxito.</p>
+    </aside>
+
+    <main class="main">
+      <form class="search" id="searchForm">
+        <label for="query">Pergunta, tema ou tese jurídica</label>
+        <div class="search-row">
+          <textarea id="query" required placeholder="Ex.: proteção de dados pessoais"></textarea>
+          <button class="submit" id="submit">Pesquisar</button>
+        </div>
+        <div class="meta"><span class="tag">POST /v1/search</span><span class="tag" id="apiTag">API: verificando</span><span class="tag">sem armazenamento local</span></div>
+      </form>
+      <div class="notice" id="notice">Digite uma consulta ou selecione uma demonstração.</div>
+      <section id="output"><div class="output-empty">Os resultados aparecerão aqui com resumo de cobertura, links oficiais e detalhes técnicos.</div></section>
+    </main>
+  </section>
+
+  <footer class="footer">
+    <div><strong>Lex</strong><p>Pesquisa jurídica assistida do ecossistema HomoSapiens.id.</p></div>
+    <div><strong>Limite</strong><p>Não promete resultado e não substitui revisão profissional.</p></div>
+    <div><strong>Operação</strong><p><a href="/health">Health</a> · <a href="/v1/readiness">Readiness</a> · <a href="/v1/sources">Fontes</a></p></div>
+  </footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), esc=(v='')=>String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const form=$('#searchForm'), query=$('#query'), submit=$('#submit'), notice=$('#notice'), output=$('#output');
+document.querySelectorAll('.example').forEach(b=>b.onclick=()=>{query.value=b
