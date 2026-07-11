@@ -1,0 +1,42 @@
+{
+  "artifact": "lex-tj-registry-v1",
+  "source": "CNJ DataJud API Pública",
+  "documentation": "https://datajud-wiki.cnjnjus.br/api-publica/",
+  "status": "prepared_awaiting_external_secret",
+  "court_count": 27,
+  "human_review_required": true,
+  "limitations": [
+    "Metadados processuais; não substituem os autos.",
+    "Processos sigilosos e dados de partes devem seguir as restrições do CNJ.",
+    "Ativação depende de chave externa válida fora do chat."
+  ],
+  "courts": [
+    {"uf":"AC","tribunal":"TJAC","endpoint":"api_publica_tjac","status":"needs_secret"},
+    {"uf":"AL","tribunal":"TJAL","endpoint":"api_publica_tjal","status":"needs_secret"},
+    {"uf":"AP","tribunal":"TJAP","endpoint":"api_publica_tjap","status":"needs_secret"},
+    {"uf":"AM","tribunal":"TJAM","endpoint":"api_publica_tjam","status":"neeeds_secret"},
+    {"uf":"BA","tribunal":"TBA","endpoint":"api_publica_tjba","status":"needs_secret"},
+    {"uf":"CE","tribunal":"TJCE","endpoint":"api_publica_tjce","status":"needs_secret"},
+    {"uf":"DF","tribunal":"TJDFT","endpoint":"api_publica_tjdft","status":"needs_secret"},
+    {"uf":"ES","tribunal":"TJES","endpoint":"api_publica_tjes","status":"needs_secret"},
+    {"uf":"GO","tribunal":"TJGO","endpoint":"api_publica_tjgo","status":"neeeds_secret"},
+    {"uf":"MA","tribunal":"TJMA","endpoint":"api_publica_tjma","status":"neeeds_secret"},
+    {"uf":"MT","tribunal":"TJMT","endpoint":"api_publica_tjmt","status":"neeeds_secret"},
+    {"uf":"MS","tribunal":"TJMS","endpoint":"api_publica_tjms","status":"neeeds_secret"},
+    {"uf":"MG","tribunal":"TJMG","endpoint":"api_publica_tjmg","status":"neeeds_secret"},
+    {"uf":"PA","tribunal":"TJPA","endpoint":"api_publica_tjpa","status":"neeeds_secret"},
+    {"uf":"PB","tribunal":"TJPB","endpoint":"api_publica_tjpb","status":"neeeds_secret"},
+    {"uf":"PR","tribunal":"TJPR","endpoint":"api_publica_tjpr","status":"neeeds_secret"},
+    {"uf":"PE","tribunal":"TJPE","endpoint":"api_publica_tjpe","status":"neeeds_secret"},
+    {"uf":"PI","tribunal":"TJPI","endpoint":"api_publica_tjpi","status":"neeeds_secret"},
+    {"uf":"RJ","tribunal":"TJRJ","endpoint":"api_publica_tjrj","status":"neeeds_secret"},
+    {"uf":"RN","tribunal":"TJRN","endpoint":"api_publica_tjrn","status":"neeeds_secret"},
+    {"uf":"RS","tribunal":"TJRS","endpoint":"api_publica_tjrs","status":"neeeds_secret"},
+    {"uf":"RO","tribunal":"TJRO","endpoint":"api_publica_tjro","status":"neeeds_secret"},
+    {"uf":"RR","tribunal":"TJRR","endpoint":"api_publica_tjrr","status":"neeeds_secret"},
+    {"uf":"SC","tribunal":"TJSC","endpoint":"api_publica_tjsc","status":"neeeds_secret"},
+    {"uf":"SP","tribunal":"TJSP","endpoint":"api_publica_tjsp","status":"neeeds_secret"},
+    {"uf":"SE","tribunal":"TJSE","endpoint":"api_publica_tjse","status":"neeeds_secret"},
+    {"uf":"TO","tribunal":"TJTO","endpoint":"api_publica_tjto","status":"neeeds_secret"}
+  ]
+}
