@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lex — Piloto de pesquisa jurídica verificável</title>
+<style>
+body{margin:0;background:#f2f0ea;color:#11120f;font:16px/1.55 system-ui,sans-serif}.wrap{max-width:1080px;margin:auto;padding:48px 24px}
+.top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ccc;padding-bottom:18px}.tag{font:11px ui-monospace,monospace;text-transform:uppercase;border:1px solid #aaa;padding:6px 8px}
+h1{font-size:clamp(42px,6vw,76px);line-height:1;letter-spacing:-.05em;max-width:900px;margin:48px 0 24px}h2{margin-top:48px;border-top:1px solid #ccc;padding-top:22px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid #ccc}.card{padding:22px}.card+.card{border-left:1px solid #ccc}
+pre{background:#11120f;color:#f2f0ea;padding:20px;overflow:auto}.note{background:#fff7de;border-left:4px solid #8a5a00;padding:18px}
+a{color:#2357ff}.cta{display:inline-block;background:#11120f;color:#fff;padding:12px 16px;text-decoration:none;margin-right:8px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.card+.card{border-left:0;border-top:1px solid #ccc}}
+</style></head><body><main class="wrap">
+<div class="top"><strong>Lex / HomoSapiens.id</strong><span class="tag">piloto funcional</span></div>
+<h1>Pesquisa jurídica assistida com fonte verificável.</h1>
+<p>Lex consulta fontes públicas, preserva a proveniência e não fabrica resultados ausentes. O piloto atual é indicado para demonstrações, integrações controladas e validação de fluxo.</p>
+<p><a class="cta" href="/">Testar demonstração</a><a href="/developers.html">Documentação técnica</a></p>
+
+<h2>O que já funciona</h2>
+<div class="grid">
+<div class="card"><strong>Consulta real</strong><p>Câmara dos Deputados e TSE Dados Abertos, com URL oficial, órgão, data e horário de recuperação.</p></div>
+<div class="card"><strong>Integridade</strong><p>Resultados sintéticos são proibidos. Consulta sem base suficiente retorna zero, sem conclusão inventada.</p></div>
+<div class="card"><strong>Operação</strong><p>Health, readiness, trace ID, OpenAPI, rate limit e rollback documentado.</p></div>
+</div>
+
+<h2>Planos do piloto</h2>
+<div class="grid">
+<div class="card"><span class="tag">Demonstração</span><h3>Uso público controlado</h3><p>Até 20 consultas por hora por IP. Máximo de cinco resultados por consulta.</p></div>
+<div class="card"><span class="tag">Integração</span><h3>API comercial piloto</h3><p>Chave individual, limite de 120 requisições por minuto e até 20 resultados por consulta. Provisionamento por canal seguro.</p></div>
+<div class="card"><span class="tag">Institucional</span><h3>Fluxo supervisionado</h3><p>Escopo, fontes e retenção definidos em conjunto. Revisão humana obrigatória.</p></div>
+</div>
+
+<h2>Exemplo público</h2>
+<pre><code>curl -X POST https://lex.homosapiens.id/v1/search \
+  -H 'Content-Type: application/json' \
+  --data '{"query":"proteção de dados pessoais","limit":3}'</code></pre>
+
+<h2>Prova técnica</h2>
+<p><a href="/proof.json">Manifesto público da implantação</a> · <a href="/openapi.yaml">Contrato OpenAPI</a> · <a href="/v1/gateway/health">Health do gateway</a> · <a href="/v1/sources">Registro de fontes</a></p>
+
+<div class="note"><strong>Limite jurídico:</strong> a Lex não substitui análise profissional, não promete resultado e ainda não possui cobertura substancial de jurisprudência nacional. DataJud depende de configuração externa; LexML, STJ e STF permanecem em desenvolvimento.</div>
+</main></body></html>
