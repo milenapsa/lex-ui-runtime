@@ -1,0 +1,181 @@
+openapi: 3.1.0
+info:
+  title: Lex API Jurídica — Runtime Público
+  version: 0.18.0-contract
+  description: >
+    Contrato público do runtime Lex. A API consulta fontes oficiais,
+    preserva proveniência e exige revisão jurídica humana.
+servers:
+  - url: https://lex.homosapiens.id
+tags:
+  - name: Operação
+  - name: Fontes
+  - name: Pesquisa
+  - name: DataJud
+  - name: Memória
+paths:
+  /health:
+    get:
+      tags: [Operação]
+      summary: Saúde consolidada do runtime
+      responses:
+        "200": {description: Runtime online}
+  /v1/readiness:
+    get:
+      tags: [Operação]
+      summary: Prontidão operacional
+      responses:
+        "200": {description: Runtime pronto}
+  /v1/gateway/health:
+    get:
+      tags: [Operação]
+      summary: Saúde do gateway e limites
+      responses:
+        "200": {description: Gateway online}
+  /v1/runtime/status:
+    get:
+      tags: [Operação]
+      summary: Estado consolidado e governança das fontes
+      responses:
+        "200":
+          description: Inventário operacional, políticas e papéis das fontes
+  /v1/sources:
+    get:
+      tags: [Fontes]
+      summary: Registro normalizado das fontes
+      responses:
+        "200": {description: Fontes e papéis operacionais}
+  /v1/sources/registry:
+    get:
+      tags: [Fontes]
+      summary: Registro completo e normalizado
+      responses:
+        "200": {description: Fontes únicas, cobertura e conectividade}
+  /v1/search:
+    post:
+      tags: [Pesquisa]
+      summary: Pesquisa geral em fontes oficiais
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/SearchRequest"}
+      responses:
+        "200":
+          description: Pesquisa concluída
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/SearchResponse"}
+        "422": {description: Consulta ausente ou limite inválido}
+        "429": {description: Limite de requisições excedido}
+  /v1/search/global:
+    post:
+      tags: [Pesquisa]
+      summary: Pesquisa global
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/SearchRequest"}
+      responses:
+        "200": {description: Pesquisa concluída}
+  /v1/search/legislacao:
+    post:
+      tags: [Pesquisa]
+      summary: Pesquisa dirigida a legislação
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/SearchRequest"}
+      responses:
+        "200": {description: Pesquisa concluída}
+  /v1/search/datasets:
+    post:
+      tags: [Pesquisa]
+      summary: Pesquisa em datasets oficiais
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/SearchRequest"}
+      responses:
+        "200": {description: Pesquisa concluída}
+  /v1/datajud/health:
+    get:
+      tags: [DataJud]
+      summary: Estado seguro do motor DataJud
+      responses:
+        "200": {description: Estado do motor sem exposição de segredo}
+  /v1/datajud/sources/registry:
+    get:
+      tags: [DataJud]
+      summary: Registro de endpoints DataJud
+      responses:
+        "200": {description: Aliases e endpoints públicos conhecidos}
+  /v1/datajud/processos/{numero_cnj}:
+    get:
+      tags: [DataJud]
+      summary: Consulta protegida por número CNJ
+      security:
+        - LexApiKey: []
+      parameters:
+        - name: numero_cnj
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "200": {description: Metadados públicos encontrados}
+        "401": {description: Não autenticado}
+        "403": {description: Bloqueado pelo guard externo}
+        "404": {description: Processo não encontrado}
+        "503": {description: DataJud real não configurado}
+  /v1/memory/status:
+    get:
+      tags: [Memória]
+      summary: Estado seguro da memória Lex
+      responses:
+        "200": {description: Backend e contadores, sem conteúdo sensível}
+components:
+  securitySchemes:
+    LexApiKey:
+      type: apiKey
+      in: header
+      name: X-Lex-API-Key
+  schemas:
+    SearchRequest:
+      type: object
+      required: [query]
+      properties:
+        query: {type: string, minLength: 1, maxLength: 500}
+        limit: {type: integer, minimum: 1, maximum: 20, default: 10}
+    SearchResponse:
+      type: object
+      required: [status, trace_id, query, result_count, results, evidence, human_review_required, no_invention_policy]
+      properties:
+        status: {type: string, const: ok}
+        version: {type: string}
+        runtime_governance_version: {type: string, example: 0.18.0-governance}
+        registry_version: {type: string}
+        trace_id: {type: string, format: uuid}
+        query: {type: string}
+        result_count: {type: integer}
+        results:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        evidence:
+          type: array
+          items: {type: object, additionalProperties: true}
+        sources_used:
+          type: array
+          items: {type: string}
+        integrity:
+          type: object
+          properties:
+            official: {type: integer}
+            synthetic: {type: integer, const: 0}
+            source_urls_present: {type: integer}
+        human_review_required: {type: boolean, const: true}
+        no_invention_policy: {type: boolean, const: true}
