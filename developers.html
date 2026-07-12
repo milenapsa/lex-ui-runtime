@@ -1,16 +1,68 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lex API — Desenvolvedores</title><style>body{margin:0;background:#f2f0ea;color:#11120f;font:16px/1.55 system-ui,sans-serif}.wrap{max-width:980px;margin:auto;padding:48px 24px}a{color:#2357ff}h1{font-size:52px;line-height:1;margin:16px 0 24px}h2{margin-top:42px;border-top:1px solid #ccc;padding-top:24px}code,pre{font-family:ui-monospace,monospace}pre{background:#11120f;color:#f2f0ea;padding:20px;overflow:auto}.tag{font:11px ui-monospace,monospace;text-transform:uppercase;border:1px solid #bbb;padding:6px 8px}.note{background:#fff7de;padding:18px;border-left:4px solid #8a5a00}</style></head><body><main class="wrap"><span class="tag">Lex / API pública v0.7</span><h1>Integre pesquisa com fonte verificável.</h1><p>A API Lex consulta fontes públicas, preserva a proveniência e nunca fabrica jurisprudência ou resultado ausente.</p><p><a href="/">Abrir produto</a> · <a href="/openapi.yaml">Baixar OpenAPI</a> · <a href="/health">Health</a> · <a href="/v1/sources">Fontes</a></p><h2>Primeira chamada</h2><pre><code>curl -X POST https://lex.homosapiens.id/v1/search \
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lex API — Desenvolvedores</title>
+<style>
+body{margin:0;background:#f3f1eb;color:#11120f;font:16px/1.55 system-ui,sans-serif}
+.wrap{max-width:1040px;margin:auto;padding:46px 24px}
+a{color:#2357ff}h1{font-size:48px;line-height:1.04;margin:16px 0 22px}
+h2{margin-top:40px;border-top:1px solid #c9c6bc;padding-top:22px}
+code,pre{font-family:ui-monospace,monospace}pre{background:#11120f;color:#f3f1eb;padding:20px;overflow:auto;border-radius:8px}
+.tag{font:11px ui-monospace,monospace;text-transform:uppercase;border:1px solid #aaa;padding:6px 8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:20px 0}
+.card{background:#fff;padding:18px;border:1px solid #ddd9cf;border-radius:8px}
+.note{background:#fff6da;padding:18px;border-left:4px solid #8a5a00}
+.good{background:#edf8ef;padding:18px;border-left:4px solid #197a32}
+small{color:#555}
+</style>
+</head>
+<body><main class="wrap">
+<span class="tag">Lex / contrato público v0.17</span>
+<h1>API jurídica com fonte verificável, memória segura e rastreabilidade.</h1>
+<p>A Lex consulta fontes públicas oficiais, preserva URL de origem, <code>trace_id</code> e evidência técnica. O runtime não fabrica jurisprudência, norma, processo ou resultado ausente.</p>
+<p><a href="/">Abrir produto</a> · <a href="/openapi.yaml">OpenAPI</a> · <a href="/health">Health</a> · <a href="/v1/sources/registry">Registro de fontes</a></p>
+
+<h2>Estado atual</h2>
+<div class="grid">
+  <div class="card"><strong>Busca pública</strong><br><code>POST /v1/search</code><br><small>20 requisições/hora por IP no modo demo.</small></div>
+  <div class="card"><strong>DataJud</strong><br><code>GET /v1/datajud/health</code><br><small>Health público; consulta processual protegida.</small></div>
+  <div class="card"><strong>Memória</strong><br><code>GET /v1/memory/status</code><br><small>Retorna somente contadores e backend, sem conteúdo sensível.</small></div>
+  <div class="card"><strong>Fontes</strong><br><code>GET /v1/sources</code><br><small>Fontes federais e TJs curados.</small></div>
+</div>
+
+<h2>Primeira chamada</h2>
+<pre><code>curl -X POST https://lex.homosapiens.id/v1/search \
   -H 'Content-Type: application/json' \
-  --data '{"query":"proteção de dados pessoais","limit":5}'</code></pre><h2>Contrato de integridade</h2><p>Cada resultado informa fonte, URL oficial, órgão e horário de recuperação. O campo <code>is_synthetic</code> deve permanecer falso. O <code>trace_id</code> permite rastrear a requisição.</p><div class="note"><strong>Limite jurídico:</strong> a resposta não substitui revisão profissional. Resultado zero significa cobertura insuficiente para a consulta, e não inexistência de direito, norma ou precedente.</div><h2>Cobertura atual</h2><p>Câmara dos Deputados e TSE Dados Abertos estão conectados. DataJud depende de configuração externa segura. LexML, STJ e STF ainda não possuem cobertura substancial validada neste runtime.</p><h2>Resposta mínima</h2><pre><code>{
-  "trace_id": "uuid",
-  "result_count": 3,
-  "results": [{
-    "title": "PL 3278/2026",
-    "source": "camara_proposicoes",
-    "source_url": "https://...",
-    "official_url": "https://...",
-    "is_official": true,
-    "is_synthetic": false
-  }],
-  "human_review_required": true,
-  "no_invention_policy": true
-}</code></pre></main></body></html>
+  --data '{"query":"Lei 13.709/2018","limit":5}'</code></pre>
+
+<h2>Rotas públicas principais</h2>
+<pre><code>GET  /health
+GET  /v1/readiness
+GET  /v1/gateway/health
+GET  /v1/sources
+GET  /v1/sources/registry
+POST /v1/search
+POST /v1/search/global
+POST /v1/search/legislacao
+POST /v1/search/datasets
+GET  /v1/datajud/health
+GET  /v1/datajud/sources/registry
+GET  /v1/datajud/processos/{numero_cnj}   # protegida
+GET  /v1/memory/status</code></pre>
+
+<h2>Contrato de integridade</h2>
+<div class="good">
+Cada resultado informa fonte, URL oficial, organização, horário de recuperação e integridade. O campo <code>is_synthetic</code> deve permanecer <code>false</code>. A resposta também expõe <code>trace_id</code>, <code>sources_used</code> e <code>human_review_required</code>.
+</div>
+
+<h2>Cobertura instalada</h2>
+<p>Fontes federais: Câmara, Senado e TSE. Fontes estaduais curadas: TJSC, TJRS, TJPR, TJSP, TJMG, TJRJ e TJBA. Portais integrais permanecem registrados para consulta oficial manual quando não há contrato técnico público estável.</p>
+
+<h2>DataJud e memória</h2>
+<p><code>/v1/datajud/health</code> mostra apenas o estado do motor. A consulta por processo exige proteção e configuração externa segura; credenciais não pertencem ao chat nem ao OpenAPI.</p>
+<p><code>/v1/memory/status</code> retorna backend, contadores e auditoria, sem expor documentos, dados pessoais ou segredos.</p>
+
+<div class="note"><strong>Limite jurídico:</strong> a API é apoio de pesquisa. Nenhuma resposta substitui revisão da Dra. Milena Peterle Savio Abreu ou de profissional responsável. Resultado zero significa ausência de achado nas fontes consultadas, não inexistência de direito, norma ou precedente.</div>
+</main></body></html>
