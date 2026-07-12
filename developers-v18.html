@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lex API — Desenvolvedores</title>
+<style>
+body{margin:0;background:#f5f3ed;color:#171827;font:16px/1.55 system-ui,sans-serif}.w{max-width:1050px;margin:auto;padding:46px 24px}
+h1{font-size:46px;line-height:1.05}h2{margin-top:38px;border-top:1px solid #cbc7bb;padding-top:20px}
+code,pre{font-family:ui-monospace,monospace}pre{background:#151725;color:#f5f3ed;padding:18px;overflow:auto;border-radius:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.c{background:#fff;border:1px solid #ddd8cb;padding:18px;border-radius:8px}
+.ok{background:#edf8ef;border-left:4px solid #197a32;padding:18px}.note{background:#fff5d9;border-left:4px solid #9a6700;padding:18px}
+a{color:#2357ff}.tag{font:12px ui-monospace,monospace;text-transform:uppercase;border:1px solid #888;padding:5px 8px}
+</style></head><body><main class="w">
+<span class="tag">Lex / contrato público v0.18</span>
+<h1>API jurídica com fonte verificável, governança operacional e rastreabilidade.</h1>
+<p>A Lex consulta fontes públicas oficiais, preserva URL, evidência e <code>trace_id</code>. Não fabrica jurisprudência, processo, norma ou resultado ausente.</p>
+<p><a href="/">Produto</a> · <a href="/openapi.yaml">OpenAPI</a> · <a href="/health">Health</a> · <a href="/v1/runtime/status">Runtime status</a></p>
+<h2>Estado operacional</h2>
+<div class="grid">
+<div class="c"><strong>Fontes únicas</strong><br>30 registradas</div>
+<div class="c"><strong>Pesquisa ativa</strong><br>17 fontes automáticas</div>
+<div class="c"><strong>Portais manuais</strong><br>7 portais oficiais</div>
+<div class="c"><strong>Política</strong><br>0 sintéticos permitidos</div>
+</div>
+<h2>Rotas principais</h2>
+<pre>GET  /health
+GET  /v1/readiness
+GET  /v1/gateway/health
+GET  /v1/runtime/status
+GET  /v1/sources
+GET  /v1/sources/registry
+POST /v1/search
+POST /v1/search/global
+POST /v1/search/legislacao
+POST /v1/search/datasets
+GET  /v1/datajud/health
+GET  /v1/datajud/sources/registry
+GET  /v1/datajud/processos/{numero_cnj}  # protegida
+GET  /v1/memory/status</pre>
+<h2>Primeira consulta</h2>
+<pre>curl -X POST https://lex.homosapiens.id/v1/search \
+  -H 'Content-Type: application/json' \
+  --data '{"query":"Lei 13.709/2018","limit":5}'</pre>
+<div class="ok"><strong>Governança v0.18:</strong> cada fonte informa papel operacional, pesquisa ativa, possibilidade de automação e estado de conectividade. STJ, STF e LexML não são apresentados como ativos enquanto estiverem bloqueados.</div>
+<h2>Integridade e segurança</h2>
+<p>Respostas expõem <code>sources_used</code>, <code>evidence</code>, <code>integrity</code>, <code>runtime_governance_version</code> e <code>registry_version</code>. A consulta DataJud permanece protegida e depende de configuração externa segura. Nenhum segredo pertence ao chat ou ao OpenAPI.</p>
+<div class="note"><strong>Revisão humana obrigatória:</strong> a API é apoio de pesquisa e não substitui a validação da Dra. Milena Peterle Savio Abreu ou de profissional responsável.</div>
+</main></body></html>
