@@ -1,47 +1,73 @@
 openapi: 3.1.0
 info:
-  title: Lex Search API
-  version: 0.7.0
+  title: Lex API Jurídica — Runtime Público
+  version: 0.17.0-contract
   description: |
-    Pesquisa assistida em fontes públicas verificáveis. Cada resultado inclui origem,
-    URL oficial e instante de recuperação. Revisão humana é obrigatória.
-    A ausência de resultados não constitui conclusão jurídica.
+    Contrato público do runtime Lex em lex.homosapiens.id.
+    A API consulta fontes oficiais e preserva proveniência, URLs e rastreabilidade.
+    Resultados não substituem revisão jurídica humana. Resultados sintéticos são proibidos.
   contact:
-    name: HomoSapiens.id
+    name: HomoSapiens / Peterle
 servers:
   - url: https://lex.homosapiens.id
+tags:
+  - name: Operação
+  - name: Fontes
+  - name: Pesquisa
+  - name: DataJud
+  - name: Memória
 paths:
   /health:
     get:
-      summary: Saúde do Search Core
+      tags: [Operação]
+      summary: Saúde do agregador público
       operationId: getHealth
       responses:
         "200":
-          description: Serviço online
+          description: Runtime online
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Health"
   /v1/readiness:
     get:
-      summary: Prontidão e fontes online
+      tags: [Operação]
+      summary: Prontidão operacional
       operationId: getReadiness
       responses:
         "200":
-          description: Serviço pronto
+          description: Runtime pronto
+  /v1/gateway/health:
+    get:
+      tags: [Operação]
+      summary: Saúde do gateway e limites
+      operationId: getGatewayHealth
+      responses:
+        "200":
+          description: Gateway online
   /v1/sources:
     get:
-      summary: Registro de fontes e estado dos conectores
+      tags: [Fontes]
+      summary: Registro resumido das fontes
       operationId: listSources
       responses:
         "200":
-          description: Registro de fontes
+          description: Fontes registradas e respectivos estados
+  /v1/sources/registry:
+    get:
+      tags: [Fontes]
+      summary: Registro completo das fontes
+      operationId: getSourcesRegistry
+      responses:
+        "200":
+          description: Registro completo, cobertura, status e URLs oficiais
   /v1/search:
     post:
-      summary: Pesquisa global em fontes públicas
+      tags: [Pesquisa]
+      summary: Pesquisa geral em fontes públicas oficiais
       description: |
-        Retorna apenas registros recuperados de fontes consultadas. Resultados sintéticos
-        são proibidos. Fontes indisponíveis aparecem em evidence/warnings.
+        Endpoint público de demonstração. Limite atual: 20 requisições por hora por IP.
+        Retorna somente registros recuperados de fontes consultadas; não fabrica resultados.
       operationId: search
       requestBody:
         required: true
@@ -50,34 +76,141 @@ paths:
             schema:
               $ref: "#/components/schemas/SearchRequest"
             examples:
-              lgpd:
+              legislacao:
                 value:
-                  query: proteção de dados pessoais
+                  query: Lei 13.709/2018
+                  limit: 5
+              jurisprudencia:
+                value:
+                  query: prisão preventiva dados objetivos processo
                   limit: 5
       responses:
         "200":
           description: Pesquisa concluída, inclusive quando result_count for zero
+          headers:
+            X-RateLimit-Limit:
+              schema: {type: integer}
+              description: Limite da faixa de acesso
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/SearchResponse"
         "422":
           description: Consulta ausente ou limite inválido
+        "429":
+          description: Limite de requisições excedido
+  /v1/search/global:
+    post:
+      tags: [Pesquisa]
+      summary: Pesquisa global
+      operationId: searchGlobal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+      responses:
+        "200":
+          description: Pesquisa concluída
+  /v1/search/legislacao:
+    post:
+      tags: [Pesquisa]
+      summary: Pesquisa dirigida a legislação
+      operationId: searchLegislation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+      responses:
+        "200":
+          description: Pesquisa concluída
+  /v1/search/datasets:
+    post:
+      tags: [Pesquisa]
+      summary: Pesquisa em datasets oficiais
+      operationId: searchDatasets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+      responses:
+        "200":
+          description: Pesquisa concluída
+  /v1/datajud/health:
+    get:
+      tags: [DataJud]
+      summary: Estado seguro do motor DataJud
+      description: Não retorna chave, token ou segredo.
+      operationId: getDataJudHealth
+      responses:
+        "200":
+          description: Estado do motor e da configuração externa
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataJudHealth"
+  /v1/datajud/sources/registry:
+    get:
+      tags: [DataJud]
+      summary: Registro de endpoints DataJud
+      operationId: getDataJudRegistry
+      responses:
+        "200":
+          description: Aliases e endpoints públicos conhecidos
+  /v1/datajud/processos/{numero_cnj}:
+    get:
+      tags: [DataJud]
+      summary: Consulta protegida por número CNJ
+      description: |
+        Requer autorização externa e configuração segura da chave DataJud.
+        O endpoint pode responder 401/403 antes do motor ou 503 quando a chave não estiver configurada.
+      operationId: getDataJudProcess
+      security:
+        - LexApiKey: []
+      parameters:
+        - name: numero_cnj
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Número CNJ com ou sem pontuação
+      responses:
+        "200":
+          description: Metadados públicos encontrados
+        "401":
+          description: Não autenticado
+        "403":
+          description: Bloqueado pelo guard externo
+        "404":
+          description: Processo não encontrado
+        "503":
+          description: DataJud real ainda não configurado
+  /v1/memory/status:
+    get:
+      tags: [Memória]
+      summary: Estado seguro da memória Lex
+      description: Retorna apenas contadores e backend, sem conteúdo sensível.
+      operationId: getMemoryStatus
+      responses:
+        "200":
+          description: Memória operacional
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemoryStatus"
 components:
+  securitySchemes:
+    LexApiKey:
+      type: apiKey
+      in: header
+      name: X-Lex-API-Key
+      description: Credencial mantida fora do chat e enviada apenas por canal seguro.
   schemas:
-    Health:
-      type: object
-      required: [status, service, version, human_review_required, no_invention_policy]
-      properties:
-        status: {type: string, const: ok}
-        service: {type: string}
-        version: {type: string}
-        generated_at: {type: string, format: date-time}
-        real_sources_online:
-          type: array
-          items: {type: string}
-        human_review_required: {type: boolean, const: true}
-        no_invention_policy: {type: boolean, const: true}
     SearchRequest:
       type: object
       required: [query]
@@ -108,15 +241,6 @@ components:
         is_official: {type: boolean}
         is_synthetic: {type: boolean, const: false}
         retrieved_at: {type: string, format: date-time}
-    Evidence:
-      type: object
-      properties:
-        source: {type: string}
-        status: {type: string}
-        count: {type: integer}
-        request_url: {type: string, format: uri}
-        error_type: {type: string}
-        message: {type: string}
     SearchResponse:
       type: object
       required:
@@ -139,12 +263,10 @@ components:
         result_count: {type: integer}
         results:
           type: array
-          items:
-            $ref: "#/components/schemas/SearchResult"
+          items: {$ref: "#/components/schemas/SearchResult"}
         evidence:
           type: array
-          items:
-            $ref: "#/components/schemas/Evidence"
+          items: {type: object, additionalProperties: true}
         sources_used:
           type: array
           items: {type: string}
@@ -152,11 +274,49 @@ components:
           type: object
           properties:
             official: {type: integer}
-            synthetic: {type: integer}
+            synthetic: {type: integer, const: 0}
             source_urls_present: {type: integer}
         warnings:
           type: array
           items: {type: string}
+        access_tier: {type: string}
         human_review_required: {type: boolean, const: true}
         no_invention_policy: {type: boolean, const: true}
         duration_ms: {type: integer}
+    Health:
+      type: object
+      required: [status, service, version, human_review_required, no_invention_policy]
+      properties:
+        status: {type: string, const: ok}
+        service: {type: string}
+        version: {type: string, example: 0.16.0-tjba-curated}
+        generated_at: {type: string, format: date-time}
+        real_sources_online:
+          type: array
+          items: {type: string}
+        human_review_required: {type: boolean, const: true}
+        no_invention_policy: {type: boolean, const: true}
+    DataJudHealth:
+      type: object
+      properties:
+        status: {type: string}
+        service: {type: string}
+        datajud_real:
+          type: string
+          enum: [configured, not_configured]
+        query_endpoint: {type: string}
+        secret_returned: {type: integer, const: 0}
+    MemoryStatus:
+      type: object
+      properties:
+        status: {type: string}
+        memory:
+          type: object
+          properties:
+            backend: {type: string, example: sqlite}
+            items: {type: integer}
+        audit:
+          type: object
+          properties:
+            events: {type: integer}
+        privacy_mode: {type: string, example: no_secrets}
